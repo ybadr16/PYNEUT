@@ -1,0 +1,59 @@
+# GitHub Pages Configuration for Monte Carlo Neutron Transport Code
+
+# Site settings
+title: Monte Carlo Neutron Transport
+description: Educational Monte Carlo code for neutron transport simulation
+author: Youssef - Alexandria University
+email: youssef.badr@hotmail.com 
+# Theme
+theme: jekyll-theme-cayman 
+# Other free themes: minimal, slate, modernist, architect, hacker
+
+# Navigation
+navigation:
+  - title: Home
+    url: /
+  - title: Quick Start
+    url: quick-start
+  - title: API Reference
+    url: api-reference
+  - title: Known Issues
+    url: bugs-and-fixes
+  - title: Critical Fixes
+    url: critical-fixes
+
+# GitHub metadata
+repository: ybadr16/PYNEUT  
+github_url: https://github.com/ybadr16/PYNEUT
+
+# Markdown processing
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Plugins (these are supported by GitHub Pages for free)
+plugins:
+  - jekyll-relative-links
+  - jekyll-optional-front-matter
+  - jekyll-readme-index
+
+# Enable relative links
+relative_links:
+  enabled: true
+  collections: false
+
+# Enable README index
+readme_index:
+  enabled: true
+
+# Optional: Google Analytics (if you want to track visitors)
+# google_analytics: UA-XXXXXXXXX-X
+
+# Exclude from processing
+exclude:
+  - vendor
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - README.md

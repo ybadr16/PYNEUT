@@ -152,28 +152,28 @@ class Cylinder:
             # Outside: return first valid intersection (min root)
             valid = [d for d in (d1, d2) if d >= 0]
             return min(valid) if valid else None
-        def normal(self, x, y, z):
-            if self.axis == 'z':
-                dx = x - self.x0
-                dy = y - self.y0
-                mag = (dx**2 + dy**2)**0.5
-                if mag == 0:
-                    return (0.0, 0.0, 0.0)  # Handle edge case
-                return (dx/mag, dy/mag, 0.0)
-            elif self.axis == 'x':
-                dy = y - self.y0
-                dz = z - self.z0
-                mag = (dy**2 + dz**2)**0.5
-                if mag == 0:
-                    return (0.0, 0.0, 0.0)
-                return (0.0, dy/mag, dz/mag)
-            elif self.axis == 'y':
-                dx = x - self.x0
-                dz = z - self.z0
-                mag = (dx**2 + dz**2)**0.5
-                if mag == 0:
-                    return (0.0, 0.0, 0.0)
-                return (dx/mag, 0.0, dz/mag)
+    def normal(self, x, y, z):
+        if self.axis == 'z':
+            dx = x - self.x0
+            dy = y - self.y0
+            mag = (dx**2 + dy**2)**0.5
+            if mag == 0:
+                return (0.0, 0.0, 0.0)  # Handle edge case
+            return (dx/mag, dy/mag, 0.0)
+        elif self.axis == 'x':
+            dy = y - self.y0
+            dz = z - self.z0
+            mag = (dy**2 + dz**2)**0.5
+            if mag == 0:
+                return (0.0, 0.0, 0.0)
+            return (0.0, dy/mag, dz/mag)
+        elif self.axis == 'y':
+            dx = x - self.x0
+            dz = z - self.z0
+            mag = (dx**2 + dz**2)**0.5
+            if mag == 0:
+                return (0.0, 0.0, 0.0)
+            return (dx/mag, 0.0, dz/mag)
 
 class Sphere:
     def __init__(self, center, radius):
@@ -220,33 +220,6 @@ class Sphere:
         if mag == 0:
             return (0.0, 0.0, 0.0)  # Handle center point
         return (dx / mag, dy / mag, dz / mag)
-
-
-
-class Box(Region):
-    def __init__(self, x_min, x_max, y_min, y_max, z_min, z_max):
-        """
-        Define a box region bounded by planes at x_min, x_max, y_min, y_max, z_min, and z_max.
-        :param x_min: Minimum x-coordinate
-        :param x_max: Maximum x-coordinate
-        :param y_min: Minimum y-coordinate
-        :param y_max: Maximum y-coordinate
-        :param z_min: Minimum z-coordinate
-        :param z_max: Maximum z-coordinate
-        """
-        # Create the six planes defining the box
-        planes = [
-            Plane(-1, 0, 0, x_min),  # x >= x_min
-            Plane(1, 0, 0, x_max),  # x <= x_max
-            Plane(0, -1, 0, y_min),  # y >= y_min
-            Plane(0, 1, 0, y_max),  # y <= y_max
-            Plane(0, 0, -1, z_min),  # z >= z_min
-            Plane(0, 0, 1, z_max),  # z <= z_max
-        ]
-        # Initialize the Region with these planes and the intersection operation
-
-        super().__init__(surfaces=planes, operation="intersection")
-
 
 class Box(Region):
     def __init__(self, x_min, x_max, y_min, y_max, z_min, z_max):
