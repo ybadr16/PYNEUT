@@ -1,3 +1,8 @@
+---
+title: API Reference
+layout: default
+---
+
 # API Reference
 
 Complete reference documentation for all classes and functions in the Monte Carlo neutron transport code.
