@@ -65,9 +65,9 @@ def simulate_particle(state, reader, mediums, A, N, sampler, region_bounds=None,
         if region_bounds:
             x_min, x_max, y_min, y_max, z_min, z_max = region_bounds
             if x_min <= state["x"] <= x_max and y_min <= state["y"] <= y_max and z_min <= state["z"] <= z_max:
-        if not state.get("was_in_region", False):
-            region_count += 1
-            state["was_in_region"] = True
+                if not state.get("was_in_region", False):
+                    region_count += 1
+                    state["was_in_region"] = True
         current_medium = None
         max_priority = -float('inf')
         for medium in mediums:
@@ -101,6 +101,8 @@ def simulate_particle(state, reader, mediums, A, N, sampler, region_bounds=None,
                 state["y"] += epsilon * v
                 state["z"] += epsilon * w
             continue
+
+        #print("This is not printing")
 
         # Get cross-sections for the current medium
         sigma_s, sigma_a, sigma_f, Sigma_t = reader.get_cross_sections(
