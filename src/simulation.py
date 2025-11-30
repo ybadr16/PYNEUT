@@ -66,8 +66,8 @@ def simulate_particle(state, reader, mediums, A, N, sampler, region_bounds=None,
             x_min, x_max, y_min, y_max, z_min, z_max = region_bounds
             if x_min <= state["x"] <= x_max and y_min <= state["y"] <= y_max and z_min <= state["z"] <= z_max:
 if not state.get("was_in_region", False):
-                    region_count += 1
-                state["was_in_region"] = True
+                        region_count += 1
+                    state["was_in_region"] = True
         current_medium = None
         max_priority = -float('inf')
         for medium in mediums:
