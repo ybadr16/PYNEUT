@@ -3,7 +3,7 @@ description: Educational Monte Carlo code for neutron transport simulation
 theme: jekyll-theme-cayman
 
 # GitHub metadata
-repository: ybadr16/PYNEUT
+repository: ybadr16/PyNeut
 # plugins
 plugins:
   - jekyll-relative-links
