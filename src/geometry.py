@@ -30,75 +30,63 @@ def count_coordinates_in_boundary(coordinates, x_bounds, y_bounds, z_bounds):
         for x, y, z in coordinates
     )
 
-def calculate_nearest_boundary(state, regions, u, v, w, epsilon=1e-10):
+def get_primitive_surfaces(surface_list):
     """
-    Calculate the nearest boundary and determine the new region/medium.
-
-    Args:
-        state: Dictionary representing the particle's state (x, y, z, theta, phi).
-        regions: List of regions ordered from global to local.
-        u, v, w: Direction vector components (particle's velocity).
-        epsilon: Small number for floating-point comparisons.
-
-    Returns:
-        nearest_point: Coordinates of the nearest boundary point (x, y, z).
-        nearest_region: Region the particle will move into.
-        nearest_distance: Distance to the nearest boundary.
+    Recursively extracts actual geometric surfaces (Planes, Spheres, etc.)
+    from a list that might contain nested Regions.
     """
+    primitives = []
+    for surface in surface_list:
+        # Check if the surface is actually a nested Region
+        if isinstance(surface, Region):
+            # RECURSION: Go deeper to find the primitives inside
+            primitives.extend(get_primitive_surfaces(surface.surfaces))
+        else:
+            # It's a real surface (Plane, Sphere, etc.)
+            primitives.append(surface)
+    return primitives
+
+def calculate_nearest_boundary(state, regions, u, v, w):
     x, y, z = state["x"], state["y"], state["z"]
     nearest_distance = float("inf")
     nearest_point = None
     nearest_region = None
-    nearest_surface = None  # Track the nearest surface
-    max_priority = -1
+    nearest_surface = None  # <--- Initialized here
 
-    def solve_boundary_equation(surface, x, y, z, u, v, w):
-        """
-        Solve for the distance to the surface boundary f(x + du, y + dv, z + dw) = 0.
-        Returns the distance to the surface from the current position.
-        """
-        return surface.nearest_surface_method(x, y, z, u, v, w)
-
+    # Iterate over all regions provided (Global, Local, etc.)
     for region in regions:
-        for surface in region.surfaces:
-            # Compute distance to the surface
-            distance = solve_boundary_equation(surface, x, y, z, u, v, w)
 
-            # Validate the distance
-            if distance is not None and distance >= 0:  # Forward intersections only
-                # Compute the intersection point
-                point = (x + distance * u, y + distance * v, z + distance * w)
+        # FIX 1: Flatten the surfaces to handle nested CSG regions
+        # If 'region' is a Union of two Boxes, this gets the Planes of those Boxes.
+        primitives = get_primitive_surfaces(region.surfaces)
 
-                # Use the region's `contains` method to validate the point
-                if region.contains(*point):
-                    # Handle priority for coincident boundaries
-                    if abs(distance - nearest_distance) < epsilon:
-                        if region.priority > max_priority:
-                            nearest_distance = distance
-                            nearest_point = point
-                            nearest_region = region
-                            max_priority = region.priority
-                    elif distance < nearest_distance:
+        for surface in primitives:
+            # Solve for distance
+            distance = surface.nearest_surface_method(x, y, z, u, v, w)
+
+            # Basic validation (forward only)
+            if distance is not None and distance >= 0:
+
+                # Check if this is the closest valid intersection found so far
+                if distance < nearest_distance:
+
+                    # Calculate candidate point
+                    candidate_point = (x + distance * u, y + distance * v, z + distance * w)
+
+                    # Verify the point actually belongs to the region
+                    # (Necessary for CSG operations like Intersection/Difference)
+                    if region.contains(*candidate_point):
+
                         nearest_distance = distance
-                        nearest_point = point
+                        nearest_point = candidate_point
                         nearest_region = region
-                        max_priority = region.priority
 
-    if nearest_point is not None and nearest_region is not None and nearest_surface is not None:
-        new_x = nearest_point[0]
-        new_y = nearest_point[1]
-        new_z = nearest_point[2]
+                        # FIX 2: Actually assign the variable!
+                        # Now the code block at the bottom won't be dead.
+                        nearest_surface = surface
 
-        # Find the new region
-        for region in regions:
-            if region.contains(new_x, new_y, new_z):
-                nearest_region = region
-                break
-        nearest_point = (new_x, new_y, new_z)
-
-    # Handle case where no boundary is found
+    # Handle escape
     if nearest_point is None:
-        # Particle escapes geometry; handle accordingly
         return None, None, float('inf')
 
     return nearest_point, nearest_region, nearest_distance
